@@ -19,3 +19,17 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+  ignoreDifferences:
+  - group: apps
+    kind: Deployment
+    jsonPointers:
+    - /spec/replicas
+    - /metadata/annotations
+    - /metadata/labels
+    - /status
+  - group: "*"
+    kind: "*"
+    jsonPointers:
+    - /metadata/annotations
+    - /metadata/labels
+
