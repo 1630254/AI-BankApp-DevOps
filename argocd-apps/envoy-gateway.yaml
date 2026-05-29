@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: docker.io/envoyproxy
+    repoURL: https://github.com/envoyproxy/gateway/releases # Update to the actual Helm repo URL
     chart: gateway-helm
-    targetRevision: "v1.4.*"
+    targetRevision: "v1.4.0" # Avoid wildcards if possible; use specific versions for stability
   destination:
     server: https://kubernetes.default.svc
     namespace: envoy-gateway-system
@@ -20,3 +20,9 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true # FIX: Allows handling of immutable fields by using SSA
+  ignoreDifferences:        # FIX: Prevents ArgoCD from trying to patch large annotations
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /metadata/annotations
