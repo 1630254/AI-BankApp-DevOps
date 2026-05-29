@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/<your-username>/AI-BankApp-DevOps.git
+    repoURL: https://github.com/1630254/AI-BankApp-DevOps.git
     targetRevision: feat/gitops
     path: argocd-apps
   destination:
