@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # 1. Use the full OCI path
+    repoURL: oci://docker.io/envoyproxy/gateway-helm
+    chart: gateway-helm
+    # 2. Match your existing version exactly to avoid upgrade conflicts
+    targetRevision: 1.2.6
+    helm:
+      # 3. Prevent the chart from trying to install CRDs that already exist
+      parameters:
+        - name: crds.install
+          value: "false"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: envoy-gateway-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      # 4. Critical: Allow adoption of existing resources
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - Replace=true
