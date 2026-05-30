@@ -7,6 +7,7 @@ on:
       - 'src/**'
       - 'pom.xml'
       - 'Dockerfile'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:
@@ -35,8 +36,9 @@ jobs:
         run: ./mvnw clean package -DskipTests -B
 
       - name: Run tests
+        # REMOVED: continue-on-error: true
+        # Now, if a test fails, the workflow will stop immediately
         run: ./mvnw test -B
-        continue-on-error: true
 
       - name: Set image tag
         id: tag
@@ -59,8 +61,9 @@ jobs:
           tags: |
             ${{ env.DOCKERHUB_REPO }}:latest
             ${{ env.DOCKERHUB_REPO }}:${{ steps.tag.outputs.sha_short }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # FIX: Scope cache by branch to prevent stale dependency leakage
+          cache-from: type=gha,scope=${{ github.ref_name }}
+          cache-to: type=gha,scope=${{ github.ref_name }},mode=max
 
       - name: Update Kubernetes deployment manifest
         run: |
